@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tkuchiki.github.io/logschema/schema/sql/v1/query.schema.json",
+  "title": "Normalized database slow-query log record v1",
+  "description": "A storage-neutral record for one completed database query.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "duration_nano",
+    "source",
+    "resource",
+    "data"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "The immutable schema identity for this record shape.",
+      "const": "logschema.sql.query/v1"
+    },
+    "kind": {
+      "description": "The semantic record kind.",
+      "const": "sql.query"
+    },
+    "time_unix_nano": {
+      "description": "The event time associated with the query, as Unix nanoseconds.",
+      "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableSignedDecimal"
+    },
+    "observed_time_unix_nano": {
+      "description": "The time at which the producer observed or collected the record, as Unix nanoseconds.",
+      "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableSignedDecimal"
+    },
+    "duration_nano": {
+      "description": "The query duration in nanoseconds.",
+      "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/unsignedDecimal"
+    },
+    "source": {
+      "description": "The input source from which the query record was parsed.",
+      "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/source"
+    },
+    "resource": {
+      "description": "The database service associated with the query.",
+      "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/resource"
+    },
+    "trace_context": {
+      "description": "Trace correlation context associated with the query.",
+      "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableTraceContext"
+    },
+    "data": {
+      "description": "Database-specific query identity and measurements.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "db_system",
+        "fingerprint"
+      ],
+      "properties": {
+        "db_system": {
+          "description": "The database management system, such as mysql or postgresql.",
+          "type": "string",
+          "minLength": 1
+        },
+        "database_name": {
+          "description": "The logical database name when available.",
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "operation": {
+          "description": "The database operation name, such as SELECT or UPDATE.",
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "query_text": {
+          "description": "The original or reconstructed SQL text. This field can contain sensitive data and should be omitted unless explicitly retained.",
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "query_summary": {
+          "description": "A normalized, low-cardinality query representation suitable for grouping and display.",
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "fingerprint": {
+          "description": "A stable query grouping identity and the algorithm that produced it. The value can contain sensitive query text when produced by an identity algorithm.",
+          "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/fingerprint"
+        },
+        "lock_duration_nano": {
+          "description": "The time spent waiting for query locks in nanoseconds.",
+          "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableUnsignedDecimal"
+        },
+        "rows_sent": {
+          "description": "The number of rows returned to the client.",
+          "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableUnsignedDecimal"
+        },
+        "rows_examined": {
+          "description": "The number of rows examined while executing the query.",
+          "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableUnsignedDecimal"
+        },
+        "rows_affected": {
+          "description": "The number of rows changed by the query.",
+          "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableUnsignedDecimal"
+        },
+        "bytes_sent": {
+          "description": "The number of response bytes sent by the database server.",
+          "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableUnsignedDecimal"
+        },
+        "attributes": {
+          "description": "Additional database query attributes.",
+          "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/attributes"
+        }
+      }
+    }
+  }
+}

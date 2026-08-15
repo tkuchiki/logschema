@@ -1,0 +1,15 @@
+{
+  "schema_version": "logschema.http.request/v1",
+  "kind": "http.request",
+  "time_unix_nano": "1722772800123456789",
+  "duration_nano": "125000000",
+  "source": { "kind": "file", "name": "access.log", "line_start": "42", "line_end": "42" },
+  "resource": { "service_name": "frontend" },
+  "data": {
+    "method": "GET",
+    "url_path": "/search",
+    "url_query": "q=logschema&page=2",
+    "status_code": 200,
+    "response_body_size_bytes": "1536"
+  }
+}

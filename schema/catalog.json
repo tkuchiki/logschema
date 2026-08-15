@@ -1,0 +1,5 @@
+{
+  "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json": "core/v1/definitions.schema.json",
+  "https://tkuchiki.github.io/logschema/schema/http/v1/request.schema.json": "http/v1/request.schema.json",
+  "https://tkuchiki.github.io/logschema/schema/sql/v1/query.schema.json": "sql/v1/query.schema.json"
+}

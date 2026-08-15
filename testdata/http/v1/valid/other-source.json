@@ -1,0 +1,20 @@
+{
+  "schema_version": "logschema.http.request/v1",
+  "kind": "http.request",
+  "duration_nano": "5000000",
+  "source": {
+    "kind": "other",
+    "name": "local-artifact",
+    "attributes": {
+      "adapter.name": "workspace-import",
+      "adapter.version": "1.0.0",
+      "artifact.encoding": "jsonl",
+      "artifact.members": ["access-1.jsonl", "access-2.jsonl"]
+    }
+  },
+  "resource": {},
+  "data": {
+    "method": "GET",
+    "url_path": "/healthz"
+  }
+}

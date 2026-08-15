@@ -1,0 +1,13 @@
+{
+  "schema_version": "logschema.http.request/v1",
+  "kind": "http.request",
+  "observed_time_unix_nano": "9223372036854775807",
+  "duration_nano": "1",
+  "source": { "kind": "stdin" },
+  "resource": { "attributes": {} },
+  "data": {
+    "method": "GET",
+    "url_path": "/boundary",
+    "attributes": {}
+  }
+}

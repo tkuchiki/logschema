@@ -1,0 +1,12 @@
+{
+  "schema_version": "logschema.sql.query/v1",
+  "kind": "sql.query",
+  "duration_nano": "1",
+  "source": { "kind": "stdin" },
+  "resource": {},
+  "data": {
+    "db_system": "mysql",
+    "operation": "",
+    "fingerprint": { "value": "select-one", "algorithm": "slp", "version": "1" }
+  }
+}

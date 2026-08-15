@@ -1,0 +1,15 @@
+{
+  "schema_version": "logschema.http.request/v1",
+  "kind": "http.request",
+  "duration_nano": "1",
+  "source": { "kind": "stdin" },
+  "resource": {},
+  "trace_context": {
+    "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+    "trace_state": "vendor=value\n"
+  },
+  "data": {
+    "method": "GET",
+    "url_path": "/"
+  }
+}

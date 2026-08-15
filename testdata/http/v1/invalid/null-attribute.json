@@ -1,0 +1,12 @@
+{
+  "schema_version": "logschema.http.request/v1",
+  "kind": "http.request",
+  "duration_nano": "1",
+  "source": { "kind": "stdin" },
+  "resource": { "attributes": {} },
+  "data": {
+    "method": "GET",
+    "url_path": "/",
+    "attributes": { "cache.hit": null }
+  }
+}

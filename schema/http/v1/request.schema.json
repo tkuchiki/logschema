@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tkuchiki.github.io/logschema/schema/http/v1/request.schema.json",
+  "title": "Normalized HTTP request log record v1",
+  "description": "A storage-neutral record for one completed HTTP request.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "duration_nano",
+    "source",
+    "resource",
+    "data"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "The immutable schema identity for this record shape.",
+      "const": "logschema.http.request/v1"
+    },
+    "kind": {
+      "description": "The semantic record kind.",
+      "const": "http.request"
+    },
+    "time_unix_nano": {
+      "description": "The event time, usually when the server received the request, as Unix nanoseconds.",
+      "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableSignedDecimal"
+    },
+    "observed_time_unix_nano": {
+      "description": "The time at which the producer observed or collected the record, as Unix nanoseconds.",
+      "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableSignedDecimal"
+    },
+    "duration_nano": {
+      "description": "The request duration in nanoseconds.",
+      "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/unsignedDecimal"
+    },
+    "source": {
+      "description": "The input source from which the request record was parsed.",
+      "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/source"
+    },
+    "resource": {
+      "description": "The server or service that handled the request.",
+      "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/resource"
+    },
+    "trace_context": {
+      "description": "Trace correlation context associated with the request.",
+      "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableTraceContext"
+    },
+    "data": {
+      "description": "HTTP-specific request and response measurements.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "url_path"
+      ],
+      "properties": {
+        "method": {
+          "description": "The HTTP request method.",
+          "type": "string",
+          "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+        },
+        "url_scheme": {
+          "description": "The URL scheme when available, such as http or https.",
+          "type": ["string", "null"],
+          "pattern": "^[A-Za-z][A-Za-z0-9+.-]*$"
+        },
+        "url_authority": {
+          "description": "The URL authority, including a port when present, with credentials excluded.",
+          "type": ["string", "null"],
+          "minLength": 1,
+          "pattern": "^[^@/?#\u0000-\u0020\u007f-\u009f]+$"
+        },
+        "url_path": {
+          "description": "The percent-encoded request URL path without the query component, or an applicable special request target such as an asterisk.",
+          "type": "string",
+          "minLength": 1
+        },
+        "url_query": {
+          "description": "The percent-encoded query component without the leading question mark. An empty string preserves a trailing question mark.",
+          "type": ["string", "null"]
+        },
+        "route": {
+          "description": "The matched low-cardinality HTTP route template.",
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "status_code": {
+          "description": "The final HTTP response status code.",
+          "type": ["integer", "null"],
+          "minimum": 100,
+          "maximum": 599
+        },
+        "request_body_size_bytes": {
+          "description": "The request body size in bytes.",
+          "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableUnsignedDecimal"
+        },
+        "response_body_size_bytes": {
+          "description": "The response body size in bytes.",
+          "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/nullableUnsignedDecimal"
+        },
+        "attributes": {
+          "description": "Additional HTTP record attributes.",
+          "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/attributes"
+        }
+      }
+    }
+  }
+}

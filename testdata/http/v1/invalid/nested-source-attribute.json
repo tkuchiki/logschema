@@ -1,0 +1,14 @@
+{
+  "schema_version": "logschema.http.request/v1",
+  "kind": "http.request",
+  "duration_nano": "1",
+  "source": {
+    "kind": "other",
+    "attributes": { "adapter.config": { "format": "jsonl" } }
+  },
+  "resource": {},
+  "data": {
+    "method": "GET",
+    "url_path": "/"
+  }
+}

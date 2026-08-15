@@ -1,0 +1,21 @@
+{
+  "schema_version": "logschema.http.request/v1",
+  "kind": "http.request",
+  "observed_time_unix_nano": null,
+  "duration_nano": 9007199254740993,
+  "source": { "kind": "stdin", "name": null, "fingerprint": null, "offset_start": null, "offset_end": null, "line_start": null, "line_end": null },
+  "resource": { "service_name": null, "attributes": {} },
+  "trace_context": null,
+  "data": {
+    "method": "GET",
+    "url_scheme": null,
+    "url_authority": null,
+    "url_path": "/",
+    "url_query": null,
+    "route": null,
+    "status_code": 200,
+    "request_body_size_bytes": null,
+    "response_body_size_bytes": null,
+    "attributes": {}
+  }
+}

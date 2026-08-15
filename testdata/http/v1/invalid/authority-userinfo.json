@@ -1,0 +1,13 @@
+{
+  "schema_version": "logschema.http.request/v1",
+  "kind": "http.request",
+  "duration_nano": "1",
+  "source": { "kind": "stdin" },
+  "resource": {},
+  "data": {
+    "method": "GET",
+    "url_scheme": "https",
+    "url_authority": "user:password@example.com",
+    "url_path": "/"
+  }
+}

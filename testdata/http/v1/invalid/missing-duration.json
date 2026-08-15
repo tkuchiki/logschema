@@ -1,0 +1,11 @@
+{
+  "schema_version": "logschema.http.request/v1",
+  "kind": "http.request",
+  "source": { "kind": "stdin" },
+  "resource": { "attributes": {} },
+  "data": {
+    "method": "GET",
+    "url_path": "/",
+    "attributes": {}
+  }
+}
