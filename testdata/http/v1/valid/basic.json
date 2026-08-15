@@ -1,0 +1,37 @@
+{
+  "schema_version": "logschema.http.request/v1",
+  "kind": "http.request",
+  "time_unix_nano": "1722772800123456789",
+  "observed_time_unix_nano": "1722772801123456789",
+  "duration_nano": "125000000",
+  "source": {
+    "kind": "file",
+    "name": "access.log",
+    "fingerprint": "sha256:example",
+    "offset_start": "4096",
+    "offset_end": "4250",
+    "line_start": "42",
+    "line_end": "42"
+  },
+  "resource": {
+    "service_name": "frontend",
+    "attributes": { "deployment.environment": "production" }
+  },
+  "trace_context": {
+    "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+    "span_id": "00f067aa0ba902b7",
+    "trace_flags": 1
+  },
+  "data": {
+    "method": "GET",
+    "url_scheme": "https",
+    "url_authority": "example.com",
+    "url_path": "/users/123",
+    "url_query": "view=compact",
+    "route": "/users/:id",
+    "status_code": 200,
+    "request_body_size_bytes": "0",
+    "response_body_size_bytes": "1536",
+    "attributes": { "http.protocol": "HTTP/2.0", "cache.hit": true }
+  }
+}

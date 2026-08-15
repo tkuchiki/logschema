@@ -1,0 +1,23 @@
+{
+  "schema_version": "logschema.sql.query/v1",
+  "kind": "sql.query",
+  "observed_time_unix_nano": null,
+  "duration_nano": "850000000",
+  "source": { "kind": "file", "name": "postgresql.log", "fingerprint": null, "offset_start": null, "offset_end": null, "line_start": "99", "line_end": "99" },
+  "resource": { "service_name": "postgres", "attributes": {} },
+  "trace_context": { "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736" },
+  "data": {
+    "db_system": "postgresql",
+    "database_name": null,
+    "operation": "UPDATE",
+    "query_text": null,
+    "query_summary": "UPDATE jobs SET status = ? WHERE id = ?",
+    "fingerprint": { "value": "update-jobs", "algorithm": "slp", "version": "1" },
+    "lock_duration_nano": null,
+    "rows_sent": null,
+    "rows_examined": null,
+    "rows_affected": "3",
+    "bytes_sent": null,
+    "attributes": {}
+  }
+}

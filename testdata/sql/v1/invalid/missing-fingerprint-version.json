@@ -1,0 +1,23 @@
+{
+  "schema_version": "logschema.sql.query/v1",
+  "kind": "sql.query",
+  "observed_time_unix_nano": null,
+  "duration_nano": "1",
+  "source": { "kind": "stdin", "name": null, "fingerprint": null, "offset_start": null, "offset_end": null, "line_start": null, "line_end": null },
+  "resource": { "service_name": null, "attributes": {} },
+  "trace_context": null,
+  "data": {
+    "db_system": "mysql",
+    "database_name": null,
+    "operation": null,
+    "query_text": null,
+    "query_summary": null,
+    "fingerprint": { "value": "fingerprint", "algorithm": "slp" },
+    "lock_duration_nano": null,
+    "rows_sent": null,
+    "rows_examined": null,
+    "rows_affected": null,
+    "bytes_sent": null,
+    "attributes": {}
+  }
+}

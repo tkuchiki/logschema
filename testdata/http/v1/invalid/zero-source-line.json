@@ -1,0 +1,8 @@
+{
+  "schema_version": "logschema.http.request/v1",
+  "kind": "http.request",
+  "duration_nano": "1",
+  "source": { "kind": "file", "line_start": "0" },
+  "resource": {},
+  "data": { "method": "GET", "url_path": "/" }
+}

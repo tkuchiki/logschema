@@ -1,0 +1,24 @@
+{
+  "schema_version": "logschema.sql.query/v1",
+  "kind": "sql.query",
+  "time_unix_nano": "1722772800123456789",
+  "observed_time_unix_nano": "1722772801123456789",
+  "duration_nano": "1250000000",
+  "source": { "kind": "file", "name": "mysql-slow.log", "fingerprint": "sha256:mysql", "offset_start": "1024", "offset_end": "1240", "line_start": "12", "line_end": "14" },
+  "resource": { "service_name": "mysql-primary", "attributes": { "db.cluster": "main" } },
+  "trace_context": null,
+  "data": {
+    "db_system": "mysql",
+    "database_name": "app",
+    "operation": "SELECT",
+    "query_text": null,
+    "query_summary": "SELECT * FROM users WHERE id = ?",
+    "fingerprint": { "value": "select-users-by-id", "algorithm": "slp", "version": "1" },
+    "lock_duration_nano": "1000000",
+    "rows_sent": "1",
+    "rows_examined": "1",
+    "rows_affected": null,
+    "bytes_sent": "512",
+    "attributes": { "admin_command": false }
+  }
+}

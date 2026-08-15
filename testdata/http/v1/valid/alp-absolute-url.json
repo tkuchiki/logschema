@@ -1,0 +1,13 @@
+{
+  "schema_version": "logschema.http.request/v1",
+  "kind": "http.request",
+  "duration_nano": "9000000",
+  "source": { "kind": "stdin" },
+  "resource": {},
+  "data": {
+    "method": "GET",
+    "url_scheme": "https",
+    "url_authority": "example.com:8443",
+    "url_path": "/healthz"
+  }
+}

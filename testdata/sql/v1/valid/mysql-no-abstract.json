@@ -1,0 +1,18 @@
+{
+  "schema_version": "logschema.sql.query/v1",
+  "kind": "sql.query",
+  "duration_nano": "1250000000",
+  "source": { "kind": "file", "name": "mysql-slow.log", "line_start": "20", "line_end": "22" },
+  "resource": { "service_name": "mysql-primary" },
+  "data": {
+    "db_system": "mysql",
+    "database_name": "app",
+    "operation": "SELECT",
+    "query_text": "SELECT * FROM users WHERE id = 42",
+    "fingerprint": { "value": "select-users-by-id", "algorithm": "slp", "version": "1" },
+    "lock_duration_nano": "1000000",
+    "rows_sent": "1",
+    "rows_examined": "1",
+    "bytes_sent": "512"
+  }
+}
