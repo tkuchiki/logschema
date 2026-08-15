@@ -81,27 +81,8 @@
           "minLength": 1
         },
         "fingerprint": {
-          "description": "A stable query grouping identity and the algorithm that produced it.",
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["value", "algorithm", "version"],
-          "properties": {
-            "value": {
-              "description": "The fingerprint value.",
-              "type": "string",
-              "minLength": 1
-            },
-            "algorithm": {
-              "description": "The fingerprint algorithm identifier.",
-              "type": "string",
-              "minLength": 1
-            },
-            "version": {
-              "description": "The producer-defined fingerprint algorithm version.",
-              "type": "string",
-              "minLength": 1
-            }
-          }
+          "description": "A stable query grouping identity and the algorithm that produced it. The value can contain sensitive query text when produced by an identity algorithm.",
+          "$ref": "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json#/$defs/fingerprint"
         },
         "lock_duration_nano": {
           "description": "The time spent waiting for query locks in nanoseconds.",

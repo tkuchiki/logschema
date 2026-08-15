@@ -119,3 +119,38 @@ func TestNewRequest(t *testing.T) {
 		t.Fatalf("constructor output is invalid JSON: %s", encoded)
 	}
 }
+
+func TestRequestValidateHTTPMethodToken(t *testing.T) {
+	record, err := NewRequest(
+		1,
+		corev1.Source{Kind: corev1.SourceStdin},
+		RequestData{Method: "M-SEARCH", URLPath: "*"},
+	)
+	if err != nil {
+		t.Fatalf("valid extension method was rejected: %v", err)
+	}
+
+	record.Data.Method = "GET /"
+	if err := record.Validate(); err == nil {
+		t.Fatal("method containing a separator was accepted")
+	}
+}
+
+func TestRequestValidateURLAuthority(t *testing.T) {
+	authority := "example.com/path"
+	_, err := NewRequest(
+		1,
+		corev1.Source{Kind: corev1.SourceStdin},
+		RequestData{Method: "GET", URLAuthority: &authority, URLPath: "/"},
+	)
+	if err == nil {
+		t.Fatal("authority containing a path delimiter was accepted")
+	}
+}
+
+func TestRequestMarshalRejectsInvalidRecord(t *testing.T) {
+	_, err := json.Marshal(Request{})
+	if err == nil {
+		t.Fatal("invalid request was marshaled")
+	}
+}

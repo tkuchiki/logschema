@@ -9,6 +9,10 @@ Every record contains a required `schema_version`, for example
 `logschema.http.request/v1`. Schema identity is independent from the LogSchema
 Go module release version.
 
+Schema `$id` values are stable identifiers, not required network locations.
+Consumers resolve references from the bundled registry or `schema/catalog.json`
+and must not require network access for validation.
+
 ## Changes within a published schema version
 
 The JSON decoders reject unknown fields, so adding even an optional property can
@@ -49,9 +53,12 @@ interpretable. Attribute values are never null; producers omit an attribute key
 when its value is unavailable.
 
 Combined URL values are derived, not serialized. Consumers use `URI()` for the
-path-plus-query form and `URLFull()` when scheme and authority are both present.
+path-plus-query form, `URLFull()` when scheme and authority are both present,
+and `URLReference()` when they need the most complete available representation.
 SQL query text is explicitly sensitive and must not be retained or exported by
-default merely because the schema can represent it.
+default merely because the schema can represent it. Query fingerprint values
+must receive the same treatment unless the producing algorithm guarantees that
+they contain no sensitive query text.
 
 Workspace artifacts should record:
 

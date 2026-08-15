@@ -3,7 +3,6 @@ package logschema_test
 import (
 	"bytes"
 	"encoding/json"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,29 +14,24 @@ import (
 	sqlv1 "github.com/tkuchiki/logschema/sql/v1"
 )
 
-const (
-	coreSchemaID = "https://tkuchiki.github.io/logschema/schema/core/v1/definitions.schema.json"
-	httpSchemaID = "https://tkuchiki.github.io/logschema/schema/http/v1/request.schema.json"
-	sqlSchemaID  = "https://tkuchiki.github.io/logschema/schema/sql/v1/query.schema.json"
-)
-
 func TestConformanceFixtures(t *testing.T) {
 	compiler := jsonschema.NewCompiler()
-	for id, path := range map[string]string{
-		coreSchemaID: "core/v1/definitions.schema.json",
-		httpSchemaID: "http/v1/request.schema.json",
-		sqlSchemaID:  "sql/v1/query.schema.json",
-	} {
-		data, err := fs.ReadFile(logschemaschema.FS, path)
+	for _, resource := range logschemaschema.Resources() {
+		data, err := logschemaschema.Read(resource.ID)
 		if err != nil {
-			t.Fatalf("read embedded schema %s: %v", path, err)
+			t.Fatalf("read embedded schema %s: %v", resource.Path, err)
 		}
 		document, err := jsonschema.UnmarshalJSON(bytes.NewReader(data))
 		if err != nil {
-			t.Fatalf("decode schema %s: %v", id, err)
+			t.Fatalf("decode schema %s: %v", resource.ID, err)
 		}
-		if err := compiler.AddResource(id, document); err != nil {
-			t.Fatalf("add schema %s: %v", id, err)
+		if err := compiler.AddResource(resource.ID, document); err != nil {
+			t.Fatalf("add schema %s: %v", resource.ID, err)
+		}
+	}
+	for _, resource := range logschemaschema.Resources() {
+		if _, err := compiler.Compile(resource.ID); err != nil {
+			t.Fatalf("compile schema %s: %v", resource.ID, err)
 		}
 	}
 
@@ -49,13 +43,13 @@ func TestConformanceFixtures(t *testing.T) {
 	}{
 		{
 			name:     "http",
-			schemaID: httpSchemaID,
+			schemaID: logschemaschema.HTTPV1RequestID,
 			root:     "testdata/http/v1",
 			newGo:    func() any { return new(httpv1.Request) },
 		},
 		{
 			name:     "sql",
-			schemaID: sqlSchemaID,
+			schemaID: logschemaschema.SQLV1QueryID,
 			root:     "testdata/sql/v1",
 			newGo:    func() any { return new(sqlv1.Query) },
 		},

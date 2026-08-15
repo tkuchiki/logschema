@@ -54,6 +54,29 @@
       "propertyNames": { "minLength": 1 },
       "additionalProperties": { "$ref": "#/$defs/attributeValue" }
     },
+    "fingerprint": {
+      "description": "A value together with the versioned algorithm that produced it. The producing algorithm defines whether the value is safe to disclose.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "algorithm", "version"],
+      "properties": {
+        "value": {
+          "description": "The fingerprint value.",
+          "type": "string",
+          "minLength": 1
+        },
+        "algorithm": {
+          "description": "The fingerprint algorithm identifier.",
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "description": "The producer-defined fingerprint algorithm version.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
     "source": {
       "description": "The input source and optional location range from which the record was parsed.",
       "type": "object",
@@ -71,9 +94,11 @@
           "minLength": 1
         },
         "fingerprint": {
-          "description": "A producer-defined stable identity for the source content.",
-          "type": ["string", "null"],
-          "minLength": 1
+          "description": "A producer-defined stable identity for the source content and the algorithm that produced it.",
+          "oneOf": [
+            { "$ref": "#/$defs/fingerprint" },
+            { "type": "null" }
+          ]
         },
         "offset_start": {
           "description": "The inclusive zero-based byte offset at which the source record starts.",

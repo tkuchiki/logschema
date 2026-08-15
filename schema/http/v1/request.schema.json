@@ -58,7 +58,7 @@
         "method": {
           "description": "The HTTP request method.",
           "type": "string",
-          "minLength": 1
+          "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
         },
         "url_scheme": {
           "description": "The URL scheme when available, such as http or https.",
@@ -69,7 +69,7 @@
           "description": "The URL authority, including a port when present, with credentials excluded.",
           "type": ["string", "null"],
           "minLength": 1,
-          "pattern": "^[^@]+$"
+          "pattern": "^[^@/?#\u0000-\u0020\u007f-\u009f]+$"
         },
         "url_path": {
           "description": "The percent-encoded request URL path without the query component, or an applicable special request target such as an asterisk.",

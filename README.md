@@ -34,11 +34,46 @@ must pass the same conformance fixtures.
 
 The Go record types use strict JSON decoding: unknown fields, non-canonical
 decimal values, missing required values, and semantically invalid records are
-rejected during unmarshaling.
+rejected. Encoding validates records built or modified through direct struct
+access before producing JSON.
 
 The Go packages also provide small validating constructors for new records.
 They set `schema_version` and `kind`; direct struct construction remains
 available when a producer needs to populate optional fields before validation.
+
+## Resolving schema references offline
+
+Schema `$id` values are stable identifiers. Validation does not require those
+HTTPS identifiers to be fetched over the network. Consumers should register all
+embedded resources with their validator before compiling an HTTP or SQL schema.
+
+Go consumers can discover and read resources without hard-coding identifiers or
+repository paths:
+
+```go
+compiler := jsonschema.NewCompiler()
+for _, resource := range schema.Resources() {
+    data, err := schema.Read(resource.ID)
+    if err != nil {
+        return err
+    }
+
+    document, err := jsonschema.UnmarshalJSON(bytes.NewReader(data))
+    if err != nil {
+        return err
+    }
+    if err := compiler.AddResource(resource.ID, document); err != nil {
+        return err
+    }
+}
+
+requestSchema, err := compiler.Compile(schema.HTTPV1RequestID)
+```
+
+Non-Go consumers can use [`schema/catalog.json`](./schema/catalog.json) to map
+the same identifiers to files distributed in this repository. Validators must
+use the catalog or an equivalent local registry; network retrieval is neither
+required nor assumed.
 
 ## Encoding rules
 
@@ -57,6 +92,10 @@ available when a producer needs to populate optional fields before validation.
   be omitted from input records when they are empty.
 - Attribute values cannot be null. Omit the attribute key when no value is
   available.
+- Go producers must encode binary attribute values explicitly as strings;
+  `[]byte` values are rejected to avoid implicit base64 conversion.
+- Source fingerprints include value, algorithm, and version so consumers do not
+  compare identities produced by incompatible algorithms.
 - HTTP URLs are stored as scheme, authority, path, and query components. The Go
   `URI`, `URLFull`, and `URLReference` methods derive combined forms so duplicate
   serialized representations cannot disagree. Producers should redact sensitive
@@ -65,7 +104,8 @@ available when a producer needs to populate optional fields before validation.
   `query_text` is optional because it can contain credentials, personal data,
   or other literals; producers should retain it only under an explicit policy.
 - SQL fingerprints include value, algorithm, and version as one object so the
-  grouping identity remains self-describing.
+  grouping identity remains self-describing. Fingerprint values are not assumed
+  to be safe: an identity algorithm can retain the complete query text.
 - Unknown fields are rejected within a schema version.
 
 ## ALP and SLP integration

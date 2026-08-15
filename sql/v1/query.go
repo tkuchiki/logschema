@@ -2,6 +2,7 @@
 package sqlv1
 
 import (
+	"encoding/json"
 	"fmt"
 
 	corev1 "github.com/tkuchiki/logschema/core/v1"
@@ -40,25 +41,8 @@ type QueryData struct {
 	Attributes       corev1.Attributes     `json:"attributes"`
 }
 
-type Fingerprint struct {
-	Value     string `json:"value"`
-	Algorithm string `json:"algorithm"`
-	Version   string `json:"version"`
-}
-
-func (f Fingerprint) Validate() error {
-	if f.Value == "" {
-		return fmt.Errorf("logschema: query fingerprint value must not be empty")
-	}
-	if f.Algorithm == "" {
-		return fmt.Errorf("logschema: query fingerprint algorithm must not be empty")
-	}
-	if f.Version == "" {
-		return fmt.Errorf("logschema: query fingerprint version must not be empty")
-	}
-
-	return nil
-}
+// Fingerprint is the shared versioned fingerprint representation.
+type Fingerprint = corev1.Fingerprint
 
 // NewQuery creates and validates a SQL query record with canonical metadata.
 func NewQuery(
@@ -96,6 +80,17 @@ func (q *Query) UnmarshalJSON(data []byte) error {
 	*q = record
 
 	return nil
+}
+
+// MarshalJSON validates and encodes a SQL query record.
+func (q Query) MarshalJSON() ([]byte, error) {
+	if err := q.Validate(); err != nil {
+		return nil, err
+	}
+
+	type plainQuery Query
+
+	return json.Marshal(plainQuery(q))
 }
 
 func (q Query) Validate() error {

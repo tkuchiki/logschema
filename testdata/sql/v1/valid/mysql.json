@@ -4,7 +4,7 @@
   "time_unix_nano": "1722772800123456789",
   "observed_time_unix_nano": "1722772801123456789",
   "duration_nano": "1250000000",
-  "source": { "kind": "file", "name": "mysql-slow.log", "fingerprint": "sha256:mysql", "offset_start": "1024", "offset_end": "1240", "line_start": "12", "line_end": "14" },
+  "source": { "kind": "file", "name": "mysql-slow.log", "fingerprint": { "value": "mysql", "algorithm": "sha256", "version": "1" }, "offset_start": "1024", "offset_end": "1240", "line_start": "12", "line_end": "14" },
   "resource": { "service_name": "mysql-primary", "attributes": { "db.cluster": "main" } },
   "trace_context": null,
   "data": {

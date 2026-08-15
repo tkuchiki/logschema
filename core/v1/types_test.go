@@ -7,8 +7,11 @@ import (
 )
 
 func TestAttributesValidate(t *testing.T) {
+	type label string
+
 	valid := Attributes{
 		"string": "value",
+		"alias":  label("value"),
 		"number": json.Number("42"),
 		"array":  []any{"value", true},
 	}
@@ -34,6 +37,11 @@ func TestAttributesValidate(t *testing.T) {
 	if err := invalidNumber.Validate(); err == nil {
 		t.Fatal("invalid JSON number was accepted")
 	}
+
+	binary := Attributes{"binary": []byte("value")}
+	if err := binary.Validate(); err == nil {
+		t.Fatal("byte slice was accepted without an explicit string encoding")
+	}
 }
 
 func TestNilAttributesMarshalAsEmptyObject(t *testing.T) {
@@ -55,6 +63,27 @@ func TestSourceValidateLineNumber(t *testing.T) {
 	}
 	if err := source.Validate(); err == nil {
 		t.Fatal("zero source line was accepted")
+	}
+}
+
+func TestSourceValidateFingerprint(t *testing.T) {
+	source := Source{
+		Kind: SourceFile,
+		Fingerprint: &Fingerprint{
+			Value:     "content-id",
+			Algorithm: "sha256",
+		},
+	}
+
+	if err := source.Validate(); err == nil {
+		t.Fatal("source fingerprint without a version was accepted")
+	}
+}
+
+func TestAttributesMarshalRejectsInvalidValue(t *testing.T) {
+	_, err := json.Marshal(Attributes{"nested": map[string]any{"key": "value"}})
+	if err == nil {
+		t.Fatal("invalid attributes were marshaled")
 	}
 }
 

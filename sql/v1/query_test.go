@@ -1,6 +1,7 @@
 package sqlv1
 
 import (
+	"encoding/json"
 	"testing"
 
 	corev1 "github.com/tkuchiki/logschema/core/v1"
@@ -31,5 +32,12 @@ func TestFingerprintValidate(t *testing.T) {
 	fingerprint := Fingerprint{Value: "select-one", Algorithm: "slp"}
 	if err := fingerprint.Validate(); err == nil {
 		t.Fatal("fingerprint without version was accepted")
+	}
+}
+
+func TestQueryMarshalRejectsInvalidRecord(t *testing.T) {
+	_, err := json.Marshal(Query{})
+	if err == nil {
+		t.Fatal("invalid query was marshaled")
 	}
 }

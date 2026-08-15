@@ -2,6 +2,7 @@
 package httpv1
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -111,6 +112,17 @@ func (r *Request) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// MarshalJSON validates and encodes an HTTP request record.
+func (r Request) MarshalJSON() ([]byte, error) {
+	if err := r.Validate(); err != nil {
+		return nil, err
+	}
+
+	type plainRequest Request
+
+	return json.Marshal(plainRequest(r))
+}
+
 func (r Request) Validate() error {
 	if r.SchemaVersion != SchemaVersion {
 		return fmt.Errorf("logschema: unsupported HTTP request schema %q", r.SchemaVersion)
@@ -131,8 +143,8 @@ func (r Request) Validate() error {
 		}
 	}
 
-	if r.Data.Method == "" {
-		return fmt.Errorf("logschema: HTTP method must not be empty")
+	if !isHTTPToken(r.Data.Method) {
+		return fmt.Errorf("logschema: HTTP method must be a non-empty HTTP token")
 	}
 	if r.Data.URLPath == "" {
 		return fmt.Errorf("logschema: HTTP url_path must not be empty")
@@ -140,11 +152,8 @@ func (r Request) Validate() error {
 	if r.Data.URLScheme != nil && !isValidURLScheme(*r.Data.URLScheme) {
 		return fmt.Errorf("logschema: HTTP url_scheme must be a valid URI scheme")
 	}
-	if r.Data.URLAuthority != nil && *r.Data.URLAuthority == "" {
-		return fmt.Errorf("logschema: HTTP url_authority must not be empty")
-	}
-	if r.Data.URLAuthority != nil && strings.Contains(*r.Data.URLAuthority, "@") {
-		return fmt.Errorf("logschema: HTTP url_authority must not contain user information")
+	if r.Data.URLAuthority != nil && !isSafeURLAuthority(*r.Data.URLAuthority) {
+		return fmt.Errorf("logschema: HTTP url_authority must be non-empty and must not contain user information, URL component delimiters, or control characters")
 	}
 
 	if r.Data.Route != nil && *r.Data.Route == "" {
@@ -155,6 +164,47 @@ func (r Request) Validate() error {
 	}
 
 	return r.Data.Attributes.Validate()
+}
+
+func isHTTPToken(value string) bool {
+	if value == "" {
+		return false
+	}
+
+	for i := 0; i < len(value); i++ {
+		char := value[i]
+		if isASCIIAlpha(char) || (char >= '0' && char <= '9') {
+			continue
+		}
+
+		switch char {
+		case '!', '#', '$', '%', '&', '\'', '*', '+', '-', '.', '^', '_', '`', '|', '~':
+			continue
+		default:
+			return false
+		}
+	}
+
+	return true
+}
+
+func isSafeURLAuthority(authority string) bool {
+	if authority == "" {
+		return false
+	}
+
+	for _, char := range authority {
+		if char <= ' ' || (char >= 0x7f && char <= 0x9f) {
+			return false
+		}
+
+		switch char {
+		case '@', '/', '?', '#':
+			return false
+		}
+	}
+
+	return true
 }
 
 func isValidURLScheme(scheme string) bool {

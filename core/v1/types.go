@@ -18,9 +18,9 @@ const (
 )
 
 type Source struct {
-	Kind        SourceKind `json:"kind"`
-	Name        *string    `json:"name"`
-	Fingerprint *string    `json:"fingerprint"`
+	Kind        SourceKind   `json:"kind"`
+	Name        *string      `json:"name"`
+	Fingerprint *Fingerprint `json:"fingerprint"`
 
 	OffsetStart *DecimalUint64 `json:"offset_start"`
 	OffsetEnd   *DecimalUint64 `json:"offset_end"`
@@ -38,8 +38,10 @@ func (s Source) Validate() error {
 	if s.Name != nil && *s.Name == "" {
 		return fmt.Errorf("logschema: source name must not be empty")
 	}
-	if s.Fingerprint != nil && *s.Fingerprint == "" {
-		return fmt.Errorf("logschema: source fingerprint must not be empty")
+	if s.Fingerprint != nil {
+		if err := s.Fingerprint.Validate(); err != nil {
+			return err
+		}
 	}
 
 	if s.LineStart != nil && *s.LineStart == 0 {
@@ -47,6 +49,30 @@ func (s Source) Validate() error {
 	}
 	if s.LineEnd != nil && *s.LineEnd == 0 {
 		return fmt.Errorf("logschema: source line_end must be greater than zero")
+	}
+
+	return nil
+}
+
+// Fingerprint identifies a value together with the versioned algorithm that
+// produced it. The producing algorithm defines whether the value is safe to
+// disclose.
+type Fingerprint struct {
+	Value     string `json:"value"`
+	Algorithm string `json:"algorithm"`
+	Version   string `json:"version"`
+}
+
+// Validate verifies that all fingerprint identity components are present.
+func (f Fingerprint) Validate() error {
+	if f.Value == "" {
+		return fmt.Errorf("logschema: fingerprint value must not be empty")
+	}
+	if f.Algorithm == "" {
+		return fmt.Errorf("logschema: fingerprint algorithm must not be empty")
+	}
+	if f.Version == "" {
+		return fmt.Errorf("logschema: fingerprint version must not be empty")
 	}
 
 	return nil
@@ -115,8 +141,12 @@ func (a Attributes) Validate() error {
 	return nil
 }
 
-// MarshalJSON encodes nil attributes as an empty object.
+// MarshalJSON validates attributes and encodes a nil map as an empty object.
 func (a Attributes) MarshalJSON() ([]byte, error) {
+	if err := a.Validate(); err != nil {
+		return nil, err
+	}
+
 	if a == nil {
 		return []byte("{}"), nil
 	}
@@ -179,7 +209,23 @@ func validateAttributeValue(value any) error {
 	}
 
 	rv := reflect.ValueOf(value)
-	if rv.Kind() != reflect.Array && rv.Kind() != reflect.Slice {
+	switch rv.Kind() {
+	case reflect.String, reflect.Bool,
+		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return nil
+	case reflect.Float32, reflect.Float64:
+		if math.IsNaN(rv.Float()) || math.IsInf(rv.Float(), 0) {
+			return fmt.Errorf("floating-point value must be finite")
+		}
+
+		return nil
+	case reflect.Slice:
+		if rv.Type().Elem().Kind() == reflect.Uint8 {
+			return fmt.Errorf("byte slices are not attribute arrays; encode binary data explicitly as a string")
+		}
+	case reflect.Array:
+	default:
 		return fmt.Errorf("value must be a scalar or scalar array")
 	}
 
