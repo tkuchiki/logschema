@@ -3,6 +3,7 @@ package corev1
 import (
 	"encoding/json"
 	"math"
+	"strings"
 	"testing"
 )
 
@@ -80,6 +81,43 @@ func TestSourceValidateFingerprint(t *testing.T) {
 	}
 }
 
+func TestSourceValidateAttributes(t *testing.T) {
+	valid := Source{
+		Kind: SourceOther,
+		Attributes: Attributes{
+			"adapter.name":    "example",
+			"adapter.version": "1.0.0",
+		},
+	}
+	if err := valid.Validate(); err != nil {
+		t.Fatalf("valid source attributes rejected: %v", err)
+	}
+
+	invalid := Source{
+		Kind:       SourceOther,
+		Attributes: Attributes{"adapter.config": map[string]any{"nested": true}},
+	}
+	if err := invalid.Validate(); err == nil {
+		t.Fatal("nested source attribute was accepted")
+	}
+}
+
+func TestSourceMarshalNilAttributesAsEmptyObject(t *testing.T) {
+	data, err := json.Marshal(Source{Kind: SourceStdin})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var decoded map[string]any
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		t.Fatal(err)
+	}
+	attributes, ok := decoded["attributes"].(map[string]any)
+	if !ok || len(attributes) != 0 {
+		t.Fatalf("source attributes = %#v, want empty object", decoded["attributes"])
+	}
+}
+
 func TestAttributesMarshalRejectsInvalidValue(t *testing.T) {
 	_, err := json.Marshal(Attributes{"nested": map[string]any{"key": "value"}})
 	if err == nil {
@@ -88,9 +126,13 @@ func TestAttributesMarshalRejectsInvalidValue(t *testing.T) {
 }
 
 func TestTraceContextValidate(t *testing.T) {
-	valid := TraceContext{TraceID: "4bf92f3577b34da6a3ce929d0e0e4736"}
+	traceState := "vendor=value,other=state"
+	valid := TraceContext{
+		TraceID:    "4bf92f3577b34da6a3ce929d0e0e4736",
+		TraceState: &traceState,
+	}
 	if err := valid.Validate(); err != nil {
-		t.Fatalf("trace ID without span ID was rejected: %v", err)
+		t.Fatalf("valid trace context was rejected: %v", err)
 	}
 
 	zero := TraceContext{TraceID: "00000000000000000000000000000000"}
@@ -101,5 +143,37 @@ func TestTraceContextValidate(t *testing.T) {
 	uppercase := TraceContext{TraceID: "4BF92F3577B34DA6A3CE929D0E0E4736"}
 	if err := uppercase.Validate(); err == nil {
 		t.Fatal("uppercase trace ID was accepted")
+	}
+}
+
+func TestTraceContextValidateTraceState(t *testing.T) {
+	tests := []struct {
+		name      string
+		value     string
+		wantValid bool
+	}{
+		{name: "typical", value: "vendor=value,other=state", wantValid: true},
+		{name: "horizontal tab", value: "vendor=value,\tother=state", wantValid: true},
+		{name: "maximum length", value: strings.Repeat("a", 512), wantValid: true},
+		{name: "empty"},
+		{name: "oversized", value: strings.Repeat("a", 513)},
+		{name: "control character", value: "vendor=value\n"},
+		{name: "non-ASCII", value: "vendor=値"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			context := TraceContext{
+				TraceID:    "4bf92f3577b34da6a3ce929d0e0e4736",
+				TraceState: &test.value,
+			}
+			err := context.Validate()
+			if test.wantValid && err != nil {
+				t.Fatalf("valid trace state was rejected: %v", err)
+			}
+			if !test.wantValid && err == nil {
+				t.Fatal("invalid trace state was accepted")
+			}
+		})
 	}
 }

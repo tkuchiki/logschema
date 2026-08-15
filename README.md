@@ -94,8 +94,19 @@ required nor assumed.
   available.
 - Go producers must encode binary attribute values explicitly as strings;
   `[]byte` values are rejected to avoid implicit base64 conversion.
+- Source attributes describe the input source or how records were obtained
+  from it, such as an adapter version, artifact encoding, compression format,
+  or storage cursor. Record content belongs in the record data attributes, and
+  properties of the producing entity belong in resource attributes.
+- Producers use the `other` source kind with source attributes for source types
+  that LogSchema has not standardized. They should use stable, collision-
+  resistant attribute keys rather than assigning new meanings to existing
+  keys.
 - Source fingerprints include value, algorithm, and version so consumers do not
   compare identities produced by incompatible algorithms.
+- `trace_state` stores the serialized W3C `tracestate` field value when one is
+  available. LogSchema applies bounded character validation, while producers
+  remain responsible for validating the complete W3C member grammar.
 - HTTP URLs are stored as scheme, authority, path, and query components. The Go
   `URI`, `URLFull`, and `URLReference` methods derive combined forms so duplicate
   serialized representations cannot disagree. Producers should redact sensitive
@@ -107,6 +118,11 @@ required nor assumed.
   grouping identity remains self-describing. Fingerprint values are not assumed
   to be safe: an identity algorithm can retain the complete query text.
 - Unknown fields are rejected within a schema version.
+
+Source metadata can help a workspace or an AI-assisted investigation explain
+where a record came from. Producers must still apply an explicit disclosure
+policy: credentials, signed URLs, tenant secrets, and other sensitive adapter
+configuration must not be copied into source attributes by default.
 
 ## ALP and SLP integration
 

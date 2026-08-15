@@ -100,6 +100,10 @@
             { "type": "null" }
           ]
         },
+        "attributes": {
+          "description": "Producer-defined metadata about the input source or how records were obtained from it.",
+          "$ref": "#/$defs/attributes"
+        },
         "offset_start": {
           "description": "The inclusive zero-based byte offset at which the source record starts.",
           "oneOf": [
@@ -169,6 +173,13 @@
           "type": ["integer", "null"],
           "minimum": 0,
           "maximum": 255
+        },
+        "trace_state": {
+          "description": "The serialized W3C tracestate field value when available. Producers are responsible for validating the complete W3C member grammar.",
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[\u0009\u0020-\u007e]+$"
         }
       }
     },

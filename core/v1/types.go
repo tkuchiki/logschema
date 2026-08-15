@@ -21,6 +21,9 @@ type Source struct {
 	Kind        SourceKind   `json:"kind"`
 	Name        *string      `json:"name"`
 	Fingerprint *Fingerprint `json:"fingerprint"`
+	// Attributes contains producer-defined metadata about the input source or
+	// how records were obtained from it.
+	Attributes Attributes `json:"attributes"`
 
 	OffsetStart *DecimalUint64 `json:"offset_start"`
 	OffsetEnd   *DecimalUint64 `json:"offset_end"`
@@ -51,7 +54,7 @@ func (s Source) Validate() error {
 		return fmt.Errorf("logschema: source line_end must be greater than zero")
 	}
 
-	return nil
+	return s.Attributes.Validate()
 }
 
 // Fingerprint identifies a value together with the versioned algorithm that
@@ -95,6 +98,9 @@ type TraceContext struct {
 	TraceID    string  `json:"trace_id"`
 	SpanID     *string `json:"span_id"`
 	TraceFlags *uint8  `json:"trace_flags"`
+	// TraceState contains the serialized W3C tracestate field value. Producers
+	// are responsible for validating the complete W3C member grammar.
+	TraceState *string `json:"trace_state"`
 }
 
 func (c TraceContext) Validate() error {
@@ -104,8 +110,25 @@ func (c TraceContext) Validate() error {
 	if c.SpanID != nil && !isValidLowerHexID(*c.SpanID, 16) {
 		return fmt.Errorf("logschema: span_id must be a non-zero lowercase 16-character hexadecimal value")
 	}
+	if c.TraceState != nil && !isSafeTraceState(*c.TraceState) {
+		return fmt.Errorf("logschema: trace_state must be 1 to 512 printable ASCII bytes, with horizontal tabs allowed")
+	}
 
 	return nil
+}
+
+func isSafeTraceState(value string) bool {
+	if value == "" || len(value) > 512 {
+		return false
+	}
+
+	for i := 0; i < len(value); i++ {
+		if value[i] != '\t' && (value[i] < ' ' || value[i] > '~') {
+			return false
+		}
+	}
+
+	return true
 }
 
 func isValidLowerHexID(value string, length int) bool {

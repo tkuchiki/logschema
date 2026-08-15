@@ -8,6 +8,7 @@
     "kind": "file",
     "name": "access.log",
     "fingerprint": { "value": "example", "algorithm": "sha256", "version": "1" },
+    "attributes": { "compression.format": "gzip", "parser.version": "1.2.0" },
     "offset_start": "4096",
     "offset_end": "4250",
     "line_start": "42",
@@ -20,7 +21,8 @@
   "trace_context": {
     "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
     "span_id": "00f067aa0ba902b7",
-    "trace_flags": 1
+    "trace_flags": 1,
+    "trace_state": "vendor=value,other=state"
   },
   "data": {
     "method": "GET",
